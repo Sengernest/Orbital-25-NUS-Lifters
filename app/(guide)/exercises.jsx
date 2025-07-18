@@ -13,6 +13,7 @@ import Spacer from "../../components/spacer";
 import { useEffect, useState } from "react";
 import { Searchbar } from "react-native-paper";
 import ThemedButton from "../../components/themedButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { capWords } from "../index";
@@ -29,19 +30,62 @@ const options = {
 
 const Exercises = () => {
   const router = useRouter();
-  const [targets, setTargets] = useState(['']) //for filtering
-  const [equipment, setEquipment] = useState([''])
+  //const [targets, setTargets] = useState(['']) //for filtering
+  const targets = [
+    "abductors",
+    "abs",
+    "adductors",
+    "biceps",
+    "calves",
+    "cardiovascular system",
+    "delts",
+    "forearms",
+    "glutes",
+    "hamstrings",
+    "lats",
+    "levator scapulae",
+    "pectorals",
+    "quads",
+    "serratus anterior",
+    "spine",
+    "traps",
+    "triceps",
+    "upper back"
+  ];
+  const equipment = [
+    "abductors",
+    "abs",
+    "adductors",
+    "biceps",
+    "calves",
+    "cardiovascular system",
+    "delts",
+    "forearms",
+    "glutes",
+    "hamstrings",
+    "lats",
+    "levator scapulae",
+    "pectorals",
+    "quads",
+    "serratus anterior",
+    "spine",
+    "traps",
+    "triceps",
+    "upper back"
+  ];
   const [searchRes, setSearchRes] = useState([]);
   const [query, setQuery] = useState("");
   const [lastSearched, setLastSearched] = useState("");
   const [toggleRec, setToggleRec] = useState(false);
 
+  /*
   useEffect(() => {
     const fetchData = () => {
       try {
         const targetsUrl = baseURL + "targetList";
         const equipmentUrl = baseURL + "equipmentList";
-        let response1 = fetch(targetsUrl, options);
+        const targetList = AsyncStorage.getItem("targetList");
+        const response1 = fetch(targetsUrl, options);
         response1.then((res) => res.json()).then((res) => setTargets(res));
         const response2 = fetch(equipmentUrl, options);
         response2.then((res) => res.json()).then((res) => setEquipment(res));
@@ -51,6 +95,7 @@ const Exercises = () => {
     }
     fetchData();
   }, []);
+  */
 
 useEffect(() => {
   const delayDebounce = setTimeout(() => {

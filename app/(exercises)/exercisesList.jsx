@@ -4,6 +4,7 @@ import ThemedView from "../../components/themedView";
 import {FlatList, Pressable, View, StyleSheet, Dimensions} from "react-native";
 import ThemedText from "../../components/themedText";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const baseURL = "https://exercisedb.p.rapidapi.com/exercises/";
 const options = {
@@ -22,20 +23,38 @@ export default function exercisesList() {
   const params = useLocalSearchParams();
   const mode = params?.mode;
   const query = params?.query;
+  const cache = AsyncStorage.getItem(mode.toString());
   const [searchRes, setSearchRes] = useState([]);
+
   useEffect(() => {
-    const searchDB = () => {
-      if (mode === 'target') {
-        const searchUrl = baseURL + 'target/' + query;
-        const response = fetch(searchUrl, options);
-        response.then((res) => res.json()).then((res) => setSearchRes(res))
-      } else if (mode === 'equipment') {
-        const searchUrl = baseURL + 'equipment/' + query;
-        const response = fetch(searchUrl, options);
-        response.then((res) => res.json()).then((res) => setSearchRes(res))
+    const fetchData = async () => {
+      const cacheTemp = await cache;
+      if (cacheTemp) {
+        const readable = JSON.parse(cacheTemp);
+        if (readable.hasOwnProperty(query.toString())) {
+          setSearchRes(readable.mode.query);
+          return ;
+        }
       }
+      const searchDB = async () => {
+        if (mode === 'target') {
+          const searchUrl = baseURL + 'target/' + query;
+          const response = fetch(searchUrl, options);
+          response.then((res) => res.json()).then((res) => {
+            setSearchRes(res)
+            if (cacheTemp) {
+              AsyncStorage.setItem(mode, JSON.stringify({query: searchRes, ...JSON.parse(cacheTemp)}));
+            }
+          })
+        } else if (mode === 'equipment') {
+          const searchUrl = baseURL + 'equipment/' + query;
+          const response = fetch(searchUrl, options);
+          response.then((res) => res.json()).then((res) => setSearchRes(res))
+        }
+      }
+      await searchDB();
     }
-    searchDB();
+    fetchData()
   }, [])
   return (
     <ThemedView>
